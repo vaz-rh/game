@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+     <style>
+    .card {
+      width: 80px;
+      height: 80px;
+      background-color: #f2f2f2;
+      border: 1px solid #ccc;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      cursor: pointer;
+      
+    }
+  </style>
+</head>
+<body>
+    <h2>Jogo da Memória</h2>
+  <div id="game-board">
+    <!-- As cartas do jogo serão adicionadas aqui dinamicamente -->
+  </div>
+
+  <script>
+    var cards = ["A", "A", "B", "B", "C", "C", "D", "D", "E", "E", "F", "F"]; // Valores das cartas
+    var selectedCards = []; // Cartas selecionadas pelo jogador
+
+    // Função para embaralhar as cartas
+    function shuffle(array) {
+      var currentIndex = array.length, temporaryValue, randomIndex;
+
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+
+      return array;
+    }
+
+    // Função para criar as cartas do jogo
+    function createCards() {
+      var shuffledCards = shuffle(cards);
+
+      var gameBoard = document.getElementById("game-board");
+
+      shuffledCards.forEach(function (card) {
+        var cardElement = document.createElement("div");
+        cardElement.classList.add("card");
+        cardElement.innerHTML = "?";
+        cardElement.addEventListener("click", function () {
+          revealCard(card, cardElement);
+        });
+
+        gameBoard.appendChild(cardElement);
+      });
+    }
+
+    // Função para revelar uma carta
+    function revealCard(card, cardElement) {
+      if (selectedCards.length < 2 && !cardElement.classList.contains("revealed")) {
+        cardElement.innerHTML = card;
+        cardElement.classList.add("revealed");
+        selectedCards.push({ card: card, element: cardElement });
+
+        if (selectedCards.length === 2) {
+          checkMatch();
+        }
+      }
+    }
+
+    // Função para verificar se houve uma combinação correta
+    function checkMatch() {
+      if (selectedCards[0].card === selectedCards[1].card) {
+        selectedCards[0].element.removeEventListener("click", null);
+        selectedCards[1].element.removeEventListener("click", null);
+        selectedCards = [];
+
+        checkGameEnd();
+      } else {
+        setTimeout(function () {
+          selectedCards[0].element.innerHTML = "?";
+          selectedCards[1].element.innerHTML = "?";
+          selectedCards[0].element.classList.remove("revealed");
+          selectedCards[1].element.classList.remove("revealed");
+          selectedCards = [];
+        }, 1000);
+      }
+    }
+
+    // Função para verificar se o jogo terminou
+    function checkGameEnd() {
+      var allCards = document.querySelectorAll(".card");
+      var revealedCards = document.querySelectorAll(".card.revealed");
+
+      if (allCards.length === revealedCards.length) {
+        setTimeout(function () {
+          alert("Parabéns! Você venceu o jogo!");
+        }, 500);
+      }
+    }
+
+    // Iniciar o jogo
+    createCards();
+  </script>
+</body>
+</html>
